@@ -1,0 +1,26 @@
+body						
+	{
+	background-color: #AEC0D6;
+
+}
+
+.introduction
+    {
+    position: relative;
+    font-family: "Impact";
+    left: 800px;
+
+}
+
+.imageprincipale
+	{
+		width: 100%;
+		padding: : 20px;
+		box-sizing: border-box;
+		
+img
+	{
+	
+	width: 300px;
+	height: 200px;
+}
