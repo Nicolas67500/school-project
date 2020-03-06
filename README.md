@@ -1,4 +1,6 @@
 # school-project
-Project i did while i was in school
+Project I did while I was at school
 
-Hi my name is Nicolas, i'm 18 years old and i'm student at College of Robert Schuman.
+i my name is Nicolas,
+
+I'm 18 years old and I'm student at Robert Schuman High School.
