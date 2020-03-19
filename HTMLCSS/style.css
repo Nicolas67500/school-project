@@ -1,14 +1,24 @@
+
 body						
 	{
 	background-color: #AEC0D6;
+	background-image: url(fondprincipal.png);
+	background-attachment: fixed; 
+    background-repeat: no-repeat; 
+
+}
+
+h1
+	{
+	text-decoration: underline;
+	text-align: center;
 
 }
 
 .introduction
     {
-    position: relative;
+    font-size: 1.4em;
     font-family: "Impact";
-    left: 800px;
 
 }
 
@@ -17,10 +27,27 @@ body
 		width: 100%;
 		padding: : 20px;
 		box-sizing: border-box;
-		
-img
-	{
-	
-	width: 300px;
-	height: 200px;
+
 }
+
+.Sommaire /* Le sommaire */
+	{
+	text-decoration: underline;
+
+}
+nav /* Ce qui es treprésenté en dessous du sommaire sur le côté gauche de la page. */
+	{
+	float: left;
+    width: 150px;
+    border: 1px solid black;
+	}
+		
+section /* C'est le texte situé au milieu de la page présentant les différentes parties. */
+	{
+	font-size: 1.2em;
+	margin-left: 170px;
+    border: 1px solid black;
+    padding: 6px;
+}
+
+
