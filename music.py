@@ -1,32 +1,38 @@
 import pygame
+from pygame.locals import *
 import os
 from random import*
 import constants
 
 def play_music(music):
-    # ------------ Sound Music of the House ---------------- #
-    # Sound of the music
+    # ------------ Musique mauison ---------------- #
+    # Musique
     pygame.mixer.music.load(music)
-    # Set the volume
+    # Volume
     pygame.mixer.music.set_volume(low_volume)
-    # Fade the music
+    # Fade de la musique
     pygame.mixer.music.fadeout(fadeout)
-    # Set on the music
+    # Lancement musique
     pygame.mixer.music.play()
 
-# / Music of the Game /
+# ----- Musique du jeu ----- #
 house_music = "Sons/home.wav"
 outside_music = "Sons/background.wav"
 
-# ------ Music settings-------- #
-# / Stop the music /
+# ------ Réglage musique -------- #
+# Eteint
 off = 0
-# / Start the music /
+# Allumé
 on = 1
-# / Volume of the music /
+# Volume
 normal_volume = 0.4
 low_volume = 0.2
-# / Fade out the volume on all sounds before stopping /
+# Réduction du volume avant l'arret
 fadeout = 400
+
+# ------------- Bruit de pas ------------ #
+
+# Son des pas dans la maison
+footstep_house = pygame.mixer.Sound("Sons/footstep_house.wav")
 
 
