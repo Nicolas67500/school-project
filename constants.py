@@ -1,11 +1,12 @@
 import pygame
+from pygame.locals import *
 import os
 from random import*
 
 # Ajout du fichier "constants" par Nicolas le 19.03
 pygame.init()
 
-# ===================== Constans ================================= #
+# ===================== Constante ================================= #
 
 # ----Colors------ #
 white = ((255,255,255))
@@ -23,15 +24,36 @@ gray = ((127,127,127))
 magenta = ((255,0,230))
 brown = ((100,40,0))
 
-# ------ Windows ------- #
-# / Screen resolution /
+# ------ Fenetre ------- #
+# Résolution écran
 WIDTH, HEIGHT = 1280, 598
+# ---- Format de l'ecran ----- #
+ecran = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF | pygame.HWSURFACE)
 
-
-# ------ Time ------- #
+# ------ Temps ------- #
 clock = pygame.time.Clock()
 FPS = 60
 
-# ------ Game ------- #
-# / Speed of the character /
+# ------ Jeu ------- #
+# Vitesse joueur
 speed = 2
+
+# --------------------------------------------------------- Image ------------------------------------------------- #
+
+# Icone du jeu
+icone = pygame.image.load("Images/icone.jpg").convert_alpha()
+
+# Fond d'écran de la maison
+image_house = pygame.image.load("Images/maison.png")
+
+# ---- Ecran d'accueil ----- #
+accueil = pygame.image.load("Images/Accueil.png").convert_alpha()
+# ------------ Image du joueur : Chargement dans des listes de toutes les images -------------- #
+droite_perso = [pygame.image.load('Images/droite' + str(k) + '.png').convert_alpha() for k in range(15)]
+gauche_perso = [pygame.image.load('Images/gauche' + str(k) + '.png').convert_alpha() for k in range(15)]
+devant_perso = pygame.image.load('Images/face0.png').convert_alpha()
+
+# ---------- PNJ TEST -------------- #
+Jean = pygame.image.load("Images/under.png")
+Jean = pygame.transform.scale(Jean, (200, 120))
+
