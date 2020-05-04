@@ -4,273 +4,209 @@
 import pygame
 from pygame.locals import *
 # Import local module
-import constants
-import music
+from fichier_class import *
+from fichier_fonction import  *
+from constants import *
+from music import *
 # Import python module
 import os
 import sys
 import math
 
+
 # MAJ :  4 Mars, mise en place de la hitbox du perso, de la maison par Nicolas le 13.03
 # MAJ : Commentaire du code, ajout du module musique et constants, ajout de la musique et des bruits de pas selon la situation par Nicolas le 19.03
+# MAJ : Simplification de la class perso (j'ai retiré l'argument "ImagePerso" de la fonction "perso_mouvement" et j'ai mis un booléen afin d'optimiser le code et son fonctionnement par Nicolas 27/03
+# + J'ai créé la classe PNJ avec leur hitbox, permettant de faciliter l'affichage des bulles de dialogue.
+# 04/04 Simplfication du code
 
-# ========= Initialization of Pygame ========== #
+# ========= Lancement de Pygame ========== #
 pygame.init()
-
-# ---- Display mode ----- #
-ecran = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT),
-                                pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.FULLSCREEN)
 # ----- Icone ------- #
-icone = pygame.image.load("Images/icone.jpg").convert_alpha()
 pygame.display.set_icon(icone)
-# ----- Title ------- #
+# ----- Titre ----- #
 pygame.display.set_caption("The Story of Gerald")
 
-# ========== MENU DU JEU ============= #
 
-# ---- Background of the menu ----- #
-accueil = pygame.image.load("Accueil.png").convert_alpha()
-
-
-# -- Function Fade: Transition from the menu to the game with a black background -- #
-def fade():
-    fade = pygame.Surface((constants.WIDTH, constants.HEIGHT))
-    fade.fill(constants.black)
-    for alpha in range(0, 300, 2):
-        fade.set_alpha(alpha)
-        ecran.blit(accueil, (0, -100))
-        ecran.blit(fade, (0, 0))
-        pygame.display.update()
-
-
-# ------------- Function Menu ------------- #
-def menu():
-    run = True
-    # Sound of the campfire
-    pygame.mixer.music.load("Sons/campfire.wav")
-    # Set the volume
-    pygame.mixer.music.set_volume(music.normal_volume)
-    # Fade the music
-    pygame.mixer.music.fadeout(music.fadeout)
-    # Set on the music
-    pygame.mixer.music.play()
-    while run:
-        # Display the image of the menu
-        ecran.blit(accueil, (0, -100))
-        for event in pygame.event.get():
-            # If we press the button "ESCAPE", it will closs the game.
-            if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == pygame.K_ESCAPE):
-                pygame.quit()
-                quit()
-            # If we press the button "ENTER", it will activate the function "Fade" and will go into the house.
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    fade()
-                    run = False
-
-        pygame.display.flip()
-
-
-# ============= Class of the character =============== #
-class personnage():
-    def __init__(self, x, y):
-        # x coordinates of the player
-        self.x = x
-        # y coordinates of the player
-        self.y = y
-        # Initializes the character movement images
-        self.nombredepas = 0
-        # CORENTIN -->>> commente le jump
-        self.jumpCount = 8
-        self.jump = False
-        # that makes a rectangle allowing to realize the hitbox by "Rect(left, top, width, height) -> Rect"
-        self.hitbox = (self.x + 17, self.y + 16, 53, 85)
-
-    def mouvement(self, ImagePerso):
-        self.ImagePerso = ImagePerso
-        ecran.blit(ImagePerso[self.nombredepas // 3], (self.x, self.y))
-        self.nombredepas += 1
-
-        if self.nombredepas + 1 >= 45:
-            self.nombredepas = 0
-
-    def affichagehitbox(self, ecran):
-        # Rect(left, top, width, height) -> Rect
-        self.hitbox = (self.x + 17, self.y + 16, 53, 85)
-        pygame.draw.rect(ecran, constants.red, self.hitbox, 2)
-        # rect(surface, color, rect, width=0) -> Rect
-        # if width == 0, (default) fill the rectangle
-        # if width > 0, used for line thickness
-        # if width < 0, nothing will be drawn
-
-
-# ============ Character ============== #
-
-# Personnage dans la fôret
-persomain = personnage(600, 430)
-# Personnage dans la maison
-persohouse = personnage(600, 376)
-# test villageois
-persojean = personnage(400, 430)
-
-# =========== Constants of the main ======= #
+# =========== Fonction Principale ======= #
 def main():
-
-    # ---------- PNJ TEST -------------- #
-    Jean = pygame.image.load("Images/under.png")
-    Jean = pygame.transform.scale(Jean, (200, 120))
-
-
-    # ----------- Background scroll -------------- #
+    # ----------- Défilement fond d'écran -------------- #
+    # Fond d'écran
     fond = [pygame.image.load('Images/Fond/Fond' + str(k) + '.png').convert_alpha() for k in range(11)]
+    # X première image
     X = [0 for k in range(11)]
+    # X deuxième image
     X2 = [928 for k in range(11)]
+    # X troisième image
     X3 = [1856 for k in range(11)]
 
-    # ------------ Image of the principal character -------------- #
-    droite_perso = [pygame.image.load('Images/droite' + str(k) + '.png').convert_alpha() for k in range(15)]
-    gauche_perso = [pygame.image.load('Images/gauche' + str(k) + '.png').convert_alpha() for k in range(15)]
-    devant_perso = pygame.image.load('Images/face0.png').convert_alpha()
-
-    # == Function "screenmain" : Display the background, pnj and hitbox == #
+    # == Fonction "screenmain" : Affiche tout ce qu'il y à a affiché dans la forêt == #
     def screenmain():
+        # Boucle qui affiche les 11 images du fond d'écran
         for k in range(11):
             ecran.blit(fond[k], (X[k], -203))
             ecran.blit(fond[k], (X2[k], -203))
             ecran.blit(fond[k], (X3[k], -203))
 
-        # Affichage du perso'
-        ecran.blit(Jean, (persojean.x, persojean.y))
+        ecran.blit(persojean.pnj_image, (persojean.x, persojean.y))
+        # Affichage de la hit.box du joueur
+        persomain.perso_hitbox()
+        persojean.pnj_hitbox()
 
-        # Affichage de la hitbox du perso principal
-        persomain.affichagehitbox(ecran)
 
-# ===== function "house" ===== #
+    # ===== Fonction "house" ===== #
     def house():
-        # Import the function "music_house" from music.py file =  load the music and play it
-        music.play_music(music.house_music)
-        # -------- Sound of the footsteps in the house ---------------- #
-        footstep_house = pygame.mixer.Sound("Sons/footstep_house.wav")
-        joue = music.off
-        # -- Volume of the footsteps in the house -- #
-        footstep_house.set_volume(music.normal_volume)
-
+        # Importation de la musique de la maison depuis "music.py"
+        play_music(house_music)
+        # Boucle des bruits de pas
+        joue = off
+        # Volume des pas dans la maison
+        footstep_house.set_volume(normal_volume)
+        # Boucle de la maison
         house = True
-        image_house = pygame.image.load("maison.png")
 
         while house:
             keys = pygame.key.get_pressed()
-
-            # Black background
-            ecran.fill(constants.black)
-            # It will blit the image of the house
+            # Remplissage de l'écran
+            ecran.fill(black)
+            # Affichage du fond d'écran
             ecran.blit(image_house, (240, 250))
-            # Display the hitbox of the character
-            persohouse.affichagehitbox(ecran)  # permettant d'afficher la hitbox du perso principal
 
-            # Commentaire : bruit de pas intérieur à mettre
-
+            # Bruit de pas quand on se déplace
             if keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]:
-                if joue == music.off:
+                # Quand on appuie pour la première sur la touche de déplacement
+                if joue == off:
+                    # On lance les bruits de pas
                     footstep_house.play(-1)
-                    joue = music.on
-                elif joue == music.on:
+                    # On allume la boucle des bruits de pas
+                    joue = on
+                # Si elle est deja allumé, on réactive les bruits de pas
+                elif joue == on:
                     pygame.mixer.unpause()
+            # Si on appuie plus sur une touche, on met les bruits de pas en pause
             else:
                 pygame.mixer.pause()
-            # If you press the "left" key, the character will go to the right
-            if keys[pygame.K_RIGHT] and persohouse.x <= 1020:
-                persohouse.mouvement(droite_perso)
-                persohouse.x += constants.speed
 
-            # If you press the "left" key, the character will go to the left
+            # Si on appuie sur la flèche de droite, le joueur va à droite
+            if keys[pygame.K_RIGHT] and persohouse.x <= 1020:
+                # Affichage des pas vers la droite
+                persohouse.perso_mouvement(True)
+                # Augmentation coordonnée X du joueur
+                persohouse.x += speed
+
+            # Si on appuie sur la flèche de gauche, le joueur va à gauche
             elif keys[pygame.K_LEFT] and persohouse.x > 225:
-                persohouse.mouvement(gauche_perso)
-                persohouse.x -= constants.speed
+                # Affichage des pas vers la gauche
+                persohouse.perso_mouvement(False)
+                # Diminution coordonnée X du joueur
+                persohouse.x -= speed
 
 
             else:
-                # If you are not moving, it will diplay the character image when he is stopped
+                # Si on appuie sur aucune flèche, on affiche l'image du joueur arreté
                 ecran.blit(devant_perso, (persohouse.x, persohouse.y))
-            constants.clock.tick(constants.FPS)
+            clock.tick(FPS)
+            if persohouse.x < 230:
+                # Cela permet d'afficher les bulles de dialogue dans la maison
+                msgmaison1.bulle_texte()
+                msgmaison2.bulle_texte()
+
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
+                # Si on appuie sur "Echap", on quitte le jeu
                 if event.type == pygame.KEYDOWN:
-                    # If we press the button "ESCAPE", it will closs the game.
                     if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == pygame.K_ESCAPE):
                         pygame.quit()
                         quit()
-                    # If you press the "ENTER" key under x = 230, you go outside.
+                    # Si on appuie sur "Entrer" lorsque le joueur a sa coordonnée X en dessous de 230
                     if event.key == pygame.K_RETURN and persohouse.x < 230:
-                        # Stop the house music
+                        # Les bruits de pas s'arrête
                         footstep_house.stop()
-                        pygame.mixer.music.stop()
+                        # La musique s'arrête
+                        pygame.mixer.stop()
+                        # La boucle de la maison s'arrête
                         house = False
 
             pygame.display.update()
 
-# =============== Main loop ================== #
+    # =============== Boucle principale ================== #
 
     run = True
-    house()
 
-    # ------------ Sound Music Outside ---------------- #
-    music.play_music(music.outside_music)
-    joue = music.off
-    # -------- Sound of the footsteps outside ---------------- #
+    # Musique extérieure
+
+    play_music(outside_music)
+    joue = off
+
+    # Bruit de pas extérieure
     footstep_outside = pygame.mixer.Sound("Sons/footstep_outside.wav")
-    # -- Volume of the footsteps outside -- #
-    footstep_outside.set_volume(music.normal_volume)
+    # Volume des pas
+    footstep_outside.set_volume(normal_volume)
+
+    # Appele de la fonction "house"
+    house()
 
     while run:
         keys = pygame.key.get_pressed()
 
-        # -- FPS of the game -- #
-        constants.clock.tick(constants.FPS)
+        # FPS du jeu
+        clock.tick(FPS)
 
-        # -------- call the screenmain function ---------------- #
+        # Appele de la fonction "screenmain"
         screenmain()
 
-        # ------- Bruit de pas dans la fôret ----------- #
+        if persojean.rect.colliderect(persomain.hitbox):
+            # On affiche les bulles de dialogue dehors lorqu'il y a une interaction avec le PNJ
+            msgdehors1.bulle_texte()
+
+        # Bruit de pas dans la forêt
         if (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]):
-            if joue == music.off:
+            if joue == off:
                 footstep_outside.play(-1)
-                joue = music.on
-            elif joue == music.on:
+                joue = on
+            elif joue == on:
                 pygame.mixer.unpause()
         else:
             pygame.mixer.pause()
 
-
-        # JUMP CORETIN A COMMENTER
+        # Saut : Si la boucle n'est pas activé
         if not (persomain.jump):
+            # Si on appuie sur "Espace"
             if keys[pygame.K_SPACE]:
+                # On active la boucle
                 persomain.jump = True
 
+        # Si elle est deja activé:
         else:
+            # Tant que le compteur du saut est supérieur à -8
             if persomain.jumpCount >= -8:
+                # Valeur qui définie si on monte ou on descend : ici on monte
                 neg = 1
+                # Si le compteur est inférieur à 0
                 if persomain.jumpCount < 0:
+                    # "neg" devient négatif
                     neg = -1
+                # Chnagement de la coordonnée Y du joueur en fonction du compteur et de la valeur "neg"
                 persomain.y -= (persomain.jumpCount ** 2) * 0.2 * neg
+                # Réduction du compteur
                 persomain.jumpCount -= 0.5
+            # Si il est égale à -8: le saut est fini
             else:
-
+                # On eteint la boucle de saut
                 persomain.jump = False
+                # On remet le compteur à 8
                 persomain.jumpCount = 8
 
-        # When the character goes on the right
+        # Le joueur va à droite
         if keys[pygame.K_RIGHT]:
-            persomain.mouvement(droite_perso)
-            persojean.x -= 2.5
+            persomain.perso_mouvement(True)
+            persojean.pnj_mouvement(True)
 
+            # Boucle qui change la coordonnée X des 11 fonds à différente vitesse pour donner de la profondeur
             for k in range(11):
                 X[k] -= k / 4
                 X2[k] -= k / 4
                 X3[k] -= k / 4
-
+            # Boucle qui remet à ca place l'image quand elle c'est décalée de sa largeur
             for k in range(11):
                 if X[k] < -928:
                     X[k] = 0
@@ -278,10 +214,11 @@ def main():
                     X2[k] = 928
                 if X3[k] < 928:
                     X3[k] = 1856
-        # When the character goes on the left
+
+        # Le joueur va à gauche
         elif keys[pygame.K_LEFT]:
-            persomain.mouvement(gauche_perso)
-            persojean.x += 2.5
+            persomain.perso_mouvement(False)
+            persojean.pnj_mouvement(False)
 
             for k in range(11):
                 X[k] += k / 4
@@ -297,16 +234,19 @@ def main():
                 if X3[k] > 1856:
                     X3[k] = 928
 
-        # If you press the "Q" key between x = 300 and x = 600, you return to the house.
+        # Quand on appuie sur "q" quand la coordonnée X du joueur est entre 300 et 600:
         elif keys[pygame.K_q] and 300 < persojean.x < 600:
-            pygame.mixer.music.stop()
+            # Musique s'arrete
+            pygame.mixer.stop()
+            # Bruits de pas extérieurs s'arrete
             footstep_outside.stop()
+            # Appele de la fonction "house" pour rentrer dans la maison
             house()
             pygame.display.flip()
-        # If you are not moving, it will diplay the character image when he is stopped
+        # Quand on ne se déplace pas, affichage du joueur de face
         else:
             ecran.blit(devant_perso, (persomain.x, persomain.y))
-        # If we press the button "ESCAPE", it will closs the game.
+        # On quitte quand on appuie sur "echap"
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == pygame.K_ESCAPE):
                 run = False
